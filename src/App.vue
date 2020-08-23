@@ -13,6 +13,7 @@
                         <div class="col-md-2 offset-1">
                             <a class="btn btn-info" v-on:click="seen = !seen">Theme</a>
                         </div>
+
                         <div class="col-md-3" v-if="seen" id="hide">
                             <select class="form-control" v-model="backgroundColorSelect" @change="changeBackgroound($event)">
                                 <option v-for="(index , item) in colorList" v-bind:key="index" v-bind:value="item"
@@ -20,13 +21,6 @@
                                 </option>
                             </select>
                         </div>
-                     <!-- <div class="col-md-2 offset-1">
-                        <select class="form-control" @change="switchLang(event)">
-                          <option v-for="(item) in langs" v-bind:key="item" v-bind:value="item"> {{ index }}
-                          </option>
-                        </select>
-                      </div>-->
-                    <lang-switcher />
                     </div>
                 </div>
             </div>
@@ -37,7 +31,7 @@
 
 <script>
     import currencyForm from "./components/currencyForm";
-    import langSwitcher from "./components/langSwitcher";
+
     export default {
         name: 'App',
         data() {
@@ -48,8 +42,8 @@
                 backgroundColorSelect: "#f8f9fa",
                 configToggle : 'none',
                 textColor: "#717171",
-                langs : ['de', 'en'],
-                colorList: [{
+                colorList: [
+                    {
                   'bg': '#f8f9fa',
                   'tc': '#717171',
                 }, {
@@ -81,7 +75,6 @@
             }
         },
         components: {
-            langSwitcher,
             currencyForm,
         },
         methods: {
