@@ -8,10 +8,10 @@
                 <select id="fromCur" class="form-control" v-model="rateFrom" @change="changeCurrencies($event,'from')" ref="fromCur">
                     <option v-for="(item, index) in items" v-bind:key="item" v-bind:value="index">{{ index }}</option>
                 </select>
-                <span>Rate: {{ rateFromText }}</span>
+                <span>{{ rateFromText }}</span>
             </div>
             <div class="col-md-6">
-                <input type="number" id="fromAmount" placeholder="From" class="form-control" ref="amount" v-model="inputed" v-on:change="calculateExchangeRate">
+                <input type="number" id="fromAmount" placeholder="From" class="form-control" ref="amount" v-model="amount" v-on:change="calculateExchangeRate">
             </div>
         </div>
 
@@ -23,7 +23,6 @@
                 <select id="toCur" class="form-control" v-model="rateTo" @change="changeCurrencies($event,'to')" ref="toCur">
                     <option v-for="(item, index) in items1" v-bind:key="item" v-bind:value="index">{{ index }}</option>
                 </select>
-                <span>Rate: {{ rateToText }}</span>
             </div>
             <div class="col-md-6">
                 <input type="number" id="toAmount" placeholder="To" class="form-control" ref="result" v-model="result" readonly>
@@ -33,63 +32,74 @@
 </template>
 
 <script>
+
+    //import latestRates from '../assets/rates'
     export default {
         name: "currency-form",
         data() {
             return {
-                inputed: "",
+                amount: "",
                 result: null,
                 items: null,
                 items1: null,
                 rateFrom: 'EUR',
                 rateTo: 'USD',
                 rateFromText: '',
-                rateToText: '',
             };
         },
         mounted() {
             this.fetchData()
+            //console.log(latestRates)
         },
         methods: {
             fetchData: function() {
-                let self = this;
-                // Simple GET request using fetch
-                fetch("https://api.exchangerate.host/latest")
-                    .then((response) => {
-                        return response.json()
+                let url = 'rates'; // json file with currency rates
+                //url  = "https://api.exchangerate.host/latest";
+                fetch(url, {
+                        headers : {
+                            'Accept': 'application/json'
+                        }
                     })
-                    .then((data) => {
-                        self.items = self.items1 = data.rates
-                    }).catch(error => {
+                    .then(response => response.json())
+                    .then(data => (
+                        this.items = this.items1 = data.rates
+                    ))
+                    .catch(error => {
                         console.log(error);
-                });
+                    });
             },
+            // returns rate value from the list
             getCurrencyRate (currency) {
                 return this.items[currency];
             },
+            // calculate exchange rate
             calculateExchangeRate: function() {
                 console.log(this.rateTo+' + '+this.rateFrom);
                 let fromRate = this.getCurrencyRate(this.rateFrom);
                 let toRate = this.getCurrencyRate(this.rateTo);
-                let amount = this.inputed;
+                let amount = this.amount; // input amount
                 let resultCalc = 0;
 
+                // if its base then multiple else divide rates to make new rate as base
                 if(fromRate === 1)
-                    resultCalc = amount * toRate;
+                    resultCalc = toRate;
                 else
-                    resultCalc = (toRate / fromRate) *  amount;
+                    resultCalc = (toRate / fromRate);
 
+                this.rateFromText = '1 '+ this.rateFrom+ ' = '+this.roundCurrency(resultCalc)+' '+this.rateTo;
+                resultCalc = resultCalc * amount
                 console.table({fromRate,amount,toRate,resultCalc});
                 // Rounding to ten thousandths
                 this.result = this.roundCurrency(resultCalc);
 
             },
-
+            // returns rounded vallue to 2 points
             roundCurrency(result) {
                return result ? Math.floor(result * 100) / 100 : null;
             },
-
+            // when currency change
             changeCurrencies(event, curtype) {
+                // assignthe rate to relevant currency, and trigger change
                 if(curtype === 'from')
                     this.rateFrom = event.target.value;
                 else if(curtype === 'to')
