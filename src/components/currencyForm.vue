@@ -8,7 +8,7 @@
                 </select>
             </div>
             <div class="col-md-5">
-                <input type="number" id="fromAmount" placeholder="From" class="form-control" ref="amount" v-model="amount" v-on:change="calculateExchangeRate">
+                <input type="number"  min="0.01" step="0.01"  id="fromAmount" placeholder="From" class="form-control" ref="amount" v-model="amount" v-on:change="calculateExchangeRate">
             </div>
         </div>
         <hr>
@@ -68,6 +68,9 @@
             calculateExchangeRate () {
                 let fromRate = this.getCurrencyRate(this.rateFrom);
                 let toRate = this.getCurrencyRate(this.rateTo);
+                if(this.amount < 0) // check for negative
+                    this.amount = Math.abs(this.amount);
+
                 let amount = this.amount; // input amount
                 let resultCalc = 0;
 
