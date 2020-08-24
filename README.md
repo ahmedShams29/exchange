@@ -1,4 +1,7 @@
-# vue3-sample
+# Currency Converter Task
+
+My first Vue project
+
 
 ## Project setup
 ```
